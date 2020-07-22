@@ -70,6 +70,10 @@ class BOT extends Client {
   get aliases() {
     return this.commands.aliases
   }
+  
+  get messages() {
+    return this.channels.cache.reduce((prev, channel) => channel.messages ? channel.messages.cache.size + prev : prev, 0)
+  }
 
   get owner() {
     return this._owner || this.users.cache.get(this.ownerID) || new (Structures.get("User"))(this, { id: this.ownerID })
@@ -80,6 +84,36 @@ class BOT extends Client {
   login() {
     console.log("[CLIENT] => Logging in...")
     return super.login(process.env.TOKEN).then(() => console.log(`[CLIENT] Logged in as ${this.user.tag}`) || this)
+  }
+  
+  
+  /* ------- custom functions ------- */
+  
+  canSpeak(channel, embeds = false, user = this.user, custom = null) {
+    let member = channel.guild.member(user)
+    let perms = member ? channel.memberPermissions(member) : null
+    return perms ? perms.has(custom ? custom : embeds ? 18432 : 2048) : false
+  }
+  
+  hasPermission(channel, permission = 2048, user = this.user) {
+    if (!channel) return;
+    
+    if (permission === "READ_MESSAGES") permission = ["VIEW_CHANNEL", "READ_MESSAGE_HISTORY"]
+    else if (permission instanceof Array && permission.includes("READ_MESSAGES")) permission = permission.trim("READ_MESSAGES").concat([66560])
+    
+    return this.canSpeak(channel, undefined, user, permission)
+  }
+
+  hasVoted(user = {}) {
+    if (!this.voters) return false
+    if (user && user.id) user = user.id
+
+    return this.voters.includes(user)
+  }
+
+  isOwner(user = {}) {
+    user = user.id ? user.id : user
+    return user === this.owner.id
   }
   
   /* ------- loading stuff ------- */
