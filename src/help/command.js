@@ -6,9 +6,10 @@ module.exports = class extends Commmand {
       name: "",
       aliases: [],
       description: "",
-      usage: "yiay ",
+      usage: "",
       category: "",
-      cooldown: 1000
+      cooldown: 1000,
+      botPerms: []
     })
   }
 }

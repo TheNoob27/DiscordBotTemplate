@@ -1,5 +1,5 @@
 {
-  "prefix": "prefix",
+  "prefix": "PREFIX",
 
   "colors": {
     "color": "#000000",
@@ -15,8 +15,8 @@
     "vote": "https://top.gg/bot/BOT_ID/vote",
     "patreon": "https://patreon.com/TheNoob27",
     "invite": "https://discordapp.com/oauth2/authorize?client_id=BOT_ID&scope=bot&permissions=PERMISSIONS",
-    "server": "https://discord.gg/rZgxfbH",
-    "support": "https://discord.gg/rZgxfbH"
+    "server": "SERVER_INVITE",
+    "support": "SERVER_INVITE"
   },
 
   "ids": {

@@ -21,7 +21,8 @@ class Command extends Toggle {
       disableMessage: null,
       lowerCaseArgs: typeof options.lowerCaseArgs === "number" ? [options.lowerCaseArgs] : options.lowerCaseArgs || false,
       owner: Boolean(options.owner),
-      requiredPermissions: options.requiredPermissions || []
+      requiredPermissions: options.requiredPermissions || [],
+      botPerms: options.botPerms || []
     }
     
     this.cooldowns = new Collection()
