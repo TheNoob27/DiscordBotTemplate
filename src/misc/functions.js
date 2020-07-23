@@ -107,6 +107,18 @@ global.waitTimeout = function (ms = 1000, fn) {
   })
 }
 
+Object.defineProperties(Object.prototype, {
+  clear: {
+    value: function() {
+      if (!this || this.constructor !== Object) return this
+      for (const i in this) delete this[i] // json stringifies only enumerable props
+      return this
+    },
+    writable: true,
+    configurable: true
+  }
+})
+
 Object.defineProperty(Number.prototype, Symbol.iterator, {
   value: function* () {
     if ([Infinity, NaN, -Infinity].includes(this.valueOf())) throw new TypeError(`${this} is not iterable`)
