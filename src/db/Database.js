@@ -58,8 +58,8 @@ class Database {
     
     let data = this.get(key, table, undefined, true)
     if (data === undefined) {
-      this.db.prepare(`INSERT INTO ${table} (ID, json) VALUES (?, ?)`).run(key, "{}");
-      data = JSON.parse(this.db.prepare(`SELECT * FROM ${table} WHERE ID = (?)`).get(key).json)
+      this.db.prepare(`INSERT INTO ${table} (key, value) VALUES (?, ?)`).run(key, "{}");
+      data = JSON.parse(this.db.prepare(`SELECT * FROM ${table} WHERE key = (?)`).get(key).value)
     }
     
     if (path.length) {
@@ -68,11 +68,11 @@ class Database {
     }
     
     // check table
-    //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (ID TEXT, json TEXT)`).run()
+    //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (key TEXT, value TEXT)`).run()
     
     if (this.caching && !path.length && table === this._tableName) this._patch(key, value)
-    this.db.prepare(`UPDATE ${table} SET json = (?) WHERE ID = (?)`).run(JSON.stringify(value), key)
-    //this.db.prepare(`INSERT OR REPLACE INTO ${table} (ID, json) VALUES (?, ?);`).run(key, JSON.stringify(value));
+    this.db.prepare(`UPDATE ${table} SET value = (?) WHERE key = (?)`).run(JSON.stringify(value), key)
+    //this.db.prepare(`INSERT OR REPLACE INTO ${table} (key, value) VALUES (?, ?);`).run(key, JSON.stringify(value));
     
     return value
   }
@@ -88,11 +88,11 @@ class Database {
       [key, ...path] = key.split(".")
     if (data === undefined) {
       // check table
-      //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (ID TEXT, json TEXT)`).run()
+      //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (key TEXT, value TEXT)`).run()
       
-      data = this.db.prepare(`SELECT * FROM ${table} WHERE ID = (?);`).get(key)
+      data = this.db.prepare(`SELECT * FROM ${table} WHERE key = (?);`).get(key)
       if (!data) return setDefault !== undefined ? this.set([key, ...path].join("."), setDefault, table) : undefined;
-      data = this._parse(key, data.json)
+      data = this._parse(key, data.value)
       
       if (this.caching && table === this._tableName) this._patch(key, data)
     }
@@ -116,18 +116,18 @@ class Database {
     keyword = obj ? JSON.stringify(keyword).split("}", 1)[0].slice(1) : String(keyword)
     
     // check table
-    //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (ID TEXT, json TEXT)`).run()
+    //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (key TEXT, value TEXT)`).run()
     
     let path;
     [keyword, ...path] = obj ? [keyword] : keyword.split(".")
     
-    let data = this.db.prepare(`SELECT * FROM ${table} WHERE json LIKE '%${keyword}%';`).get()
+    let data = this.db.prepare(`SELECT * FROM ${table} WHERE value LIKE '%${keyword}%';`).get()
     if (!data) return null
-    data.json = this._parse(data.ID, data.json)
+    data.value = this._parse(data.key, data.value)
     
-    if (this.caching && table === this._tableName) this._patch(data.ID, data.json)
+    if (this.caching && table === this._tableName) this._patch(data.key, data.value)
     
-    return path.length ? get(data.json, path.join(".")) : data // { ID: "", json: "" }
+    return path.length ? get(data.value, path.join(".")) : data // { key: "", value: "" }
   }
   
   delete(key, table) {
@@ -149,9 +149,9 @@ class Database {
     }
     
     // check table
-    //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (ID TEXT, json TEXT)`).run()
+    //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (key TEXT, value TEXT)`).run()
     
-    this.db.prepare(`DELETE FROM ${table} WHERE ID = (?)`).run(key)
+    this.db.prepare(`DELETE FROM ${table} WHERE key = (?)`).run(key)
     if (this.caching) this.cache.delete(key)
     return true
   }
@@ -188,22 +188,39 @@ class Database {
   }
   
   has(key, table, force) {
-    return this.get(key, table, undefined, force) !== undefined
+    table = this._table(table)
+    
+    if (key == null) throw new Error("No key was provided.")
+    key = String(key)
+    
+    let data = !force && this.caching ? this.cache.get(key) : undefined
+    let path;
+      [key, ...path] = key.split(".")
+    if (data === undefined) {
+      // check table
+      //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (key TEXT, value TEXT)`).run()
+      
+      data = this.db.prepare(`SELECT * FROM ${table} WHERE key = (?);`).get(key)
+    }
+    
+    if (data === undefined) return false
+    
+    return path.length ? get(data, path.join(".")) !== undefined : true
   }
   
   all(cache = true, table) {
     table = this._table(table)
     
-    //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (ID TEXT, json TEXT)`).run()
-    let rows = this.db.prepare(`SELECT * FROM ${table} WHERE ID IS NOT NULL`).iterate()
+    //this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (key TEXT, value TEXT)`).run()
+    let rows = this.db.prepare(`SELECT * FROM ${table} WHERE key IS NOT NULL`).iterate()
     
     let data = []
     for (const row of rows) {
       let entry = {
-        ID: row.ID,
-        json: this._parse(row.ID, row.json)
+        key: row.key,
+        value: this._parse(row.key, row.value)
       }
-      if (this.caching && cache && table === this._tableName) this.cache.set(row.ID, row.json)
+      if (this.caching && cache && table === this._tableName) this.cache.set(entry.key, entry.value)
       data.push(entry)
     }
     
@@ -213,9 +230,9 @@ class Database {
   _table(t) {
     let table;
     if (typeof t === "string" && !t.includes(" ") && t.toLowerCase() !== "table") table = t
-    else table = this._tableName || "json" //"db" 
+    else table = this._tableName || "db" 
     
-    if (!(table in TableCache)) TableCache[table] = this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (ID TEXT, json TEXT)`).run()
+    if (!(table in TableCache)) TableCache[table] = this.db.prepare(`CREATE TABLE IF NOT EXISTS ${table} (key TEXT, value TEXT)`).run()
     return table
   }
   
