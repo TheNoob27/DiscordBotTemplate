@@ -1,7 +1,7 @@
 const SQLiteDB = require("better-sqlite3")
 const { set, get, unset: remove } = require("lodash")
 const Query = require("./Query")
-const DB = new SQLiteDB("../StarboardDB/json.sqlite") // home/user/Bots/StarboardDB/
+const DB = new SQLiteDB(__dirname) // this directory (change if you wish)
 const { Collection } = require("discord.js")
 const on_change = require("on-change")
 
