@@ -17,7 +17,7 @@ class Database {
     
     this.watching = watching
     if (this.watching) {
-      const change = (key, path, value) => this.set(key + "." + path, value)
+      const change = (key, path, value) => this.set(`${key}${path ? `.${path}` : ""}`, value)
       
       if (typeof onChange !== "function") onChange = null
       this._onChange = onChange // suppose you want the raw version idk
