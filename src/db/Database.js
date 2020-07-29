@@ -180,7 +180,8 @@ class Database {
     if (data === undefined) return this.set(key, number, table)
     if (isNaN(data)) throw new TypeError("The target is not a number.")
     
-    return this.set(key, data + number, table)
+    this.set(key, data + number, table)
+    return data + number
   }
   
   subtract(key, value, table) {
