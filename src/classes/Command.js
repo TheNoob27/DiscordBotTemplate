@@ -16,7 +16,7 @@ class Command extends Toggle {
     
     this.settings = {
       cooldown: options.cooldown || 1000,
-      cooldownmsg: options.cooldownmsg || "You're using this command too frequently! Please wait {time} before using it again. Voters only have half of all cooldowns.",
+      cooldownmsg: options.cooldownmsg || "You're using this command too frequently! Please wait {time} before using it again. Voters have their cooldown times cut in half.",
       errorMessage: null,
       disableMessage: null,
       lowerCaseArgs: typeof options.lowerCaseArgs === "number" ? [options.lowerCaseArgs] : options.lowerCaseArgs || false,
