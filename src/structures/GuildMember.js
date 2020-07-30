@@ -36,7 +36,7 @@ module.exports = ({ Structures, Base }, { bypass, applyToClass }) => {
       
       hasPermission(perm = "MANAGE_MESSAGES") {
         if (!perm || perm === "OWNER") return this.user.owner
-        if (this.user.id === this.ownerID) return true
+        if (this.user.id === this.guild.ownerID) return true
 
         return this.roles.cache.some(r => r.permissions.has(perm, true)) || this.user.owner
       }

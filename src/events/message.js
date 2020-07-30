@@ -14,6 +14,11 @@ module.exports = class extends Event {
       message
     }
   }
+  
+  async fetchPartials(message) {
+    await message.fetch()
+    return [message]
+  }
 
   async run() {
     const [cmd, ...args] = message.content.slice(this.client.config.prefix.length).split(" ")

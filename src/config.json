@@ -1,6 +1,7 @@
 {
   "prefix": "PREFIX",
-
+  "owner": "BOT_OWNER_ID",
+  
   "colors": {
     "color": "#000000",
     "help": "#000000",
