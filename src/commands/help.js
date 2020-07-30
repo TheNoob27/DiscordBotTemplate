@@ -1,6 +1,6 @@
-const { Commmand, Embed } = require("../classes")
+const { Command, Embed } = require("../classes")
 
-module.exports = class extends Commmand {
+module.exports = class extends Command {
   constructor(client) {
     super(client, {
       name: "help",

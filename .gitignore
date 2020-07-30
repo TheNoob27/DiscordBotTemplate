@@ -1,3 +1,6 @@
 # write down files that you dont want to commit here, dont comment them out
 # .env
+node_modules
+package-lock.json
 .vscode
+src/db/*.sqlite
