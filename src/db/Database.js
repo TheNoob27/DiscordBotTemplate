@@ -1,7 +1,7 @@
 const SQLiteDB = require("better-sqlite3")
 const { set, get, unset: remove } = require("lodash")
 const Query = require("./Query")
-const DB = new SQLiteDB(__dirname) // this directory (change if you wish)
+const DB = new SQLiteDB(__dirname + "/db.sqlite") // a sqlite file in this directory (src/db/db.sqlite) - change if you wish
 const { Collection } = require("discord.js")
 const on_change = require("on-change")
 
@@ -248,7 +248,7 @@ class Database {
       try { change = JSON.stringify(d) !== JSON.stringify(c) } catch {}
         // --silently define the variables, so i wont trigger any "set"s on proxies-- nvm
       if (change) Object.defineProperties(
-          c.clear(), Object.assign(...Object.entries(d).map(([k, value]) => ({
+          Object.clear(c), Object.assign(...Object.entries(d).map(([k, value]) => ({
             [k]: { value, writable: true, configurable: true, enumerable: true }
           })))
         )

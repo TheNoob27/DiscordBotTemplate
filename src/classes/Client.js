@@ -1,4 +1,5 @@
 const { Client, Structures } = require("discord.js")
+const ClientEmojiManager = require("./ClientEmojiManager")
 const { CommandHandler, EventHandler } = require("../handlers")
 const db = require("../db")
 const { Table } = db
@@ -82,7 +83,8 @@ class BOT extends Client {
   /* ------- overwritten functions ------- */
   
   login() {
-    console.log("[CLIENT] => Logging in...")
+    // process.env.TOKEN is the default location to check, you can change this
+    console.log("[CLIENT] => Logging in...") 
     return super.login(process.env.TOKEN).then(() => console.log(`[CLIENT] Logged in as ${this.user.tag}`) || this)
   }
   
@@ -119,13 +121,18 @@ class BOT extends Client {
   /* ------- loading stuff ------- */
 
   async init() {
-    this._owner = await this.users.fetch(this.ownerID)
     this.events.load()
     this.commands.load()
+    return;
+    await this.login().then(() => {
+      this.once("ready", async () => {
+        if (!this.users.cache.has(this.ownerID)) this._owner = await this.users.fetch(this.ownerID).default(null)
+      })
+    })
   }
   
   static initialiseProcess() {
-    require("../functions.js") // load functions
+    require("../misc/functions.js") // load functions
 
     console.log(`\n\n\n[${new Date().format()}] -- NEW PROCESS --\n`)
     const { log, error } = console

@@ -3,6 +3,7 @@ const { readdirSync: readdir } = require("fs")
 
 class EventHandler extends Collection {
   constructor(client) {
+    super()
     this.client = client
   }
 
@@ -10,12 +11,13 @@ class EventHandler extends Collection {
     const evFiles = filter instanceof Array ? filter.map(f => f + ".js") : readdir("./src/events/");
 
     evFiles.forEach(e => {
+      let event;
       try {
         if (reload) delete require.cache[require.resolve(`../events/${f}`)]
-        const event = new (require(`../events/${e}`))(this.client)
+        event = new (require(`../events/${e}`))(this.client)
         this.set(event.name, event)
-      } catch {
-        return console.error(`Couldn't load event: ${e}`);
+      } catch(err) {
+        return console.error(`Couldn't load event: ${e}, Error:`, err);
       }
 
       if (this.client._events[event.name] && !(this.client._events[event.name] instanceof Array)) this.client.off(event.name, this.client._events[event.name]);
