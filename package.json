@@ -6,10 +6,11 @@
   "scripts": {
     "start": "node src/index.js"
   },
-
   "dependencies": {
     "@discordjs/uws": "^10.149.0",
+    "better-sqlite3": "^7.1.0",
     "bufferutil": "^4.0.1",
+    "command-tags": "^1.1.4",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "erlpack": "^0.1.3",
@@ -20,7 +21,6 @@
     "utf-8-validate": "^5.0.2",
     "zlib-sync": "^0.1.6"
   },
-
   "license": "MIT",
   "repository": {
     "url": "https://github.com/TheNoob27/DiscordBotTemplate"

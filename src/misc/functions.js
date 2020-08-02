@@ -21,8 +21,8 @@ global.safeEnter = function (options = {}, ...props) {
 
   let value = obj
 
-  for (let i of props) {
-    if (![undefined, null].includes(value[i])) value = value[i]
+  for (const i of props) {
+    if (value[i] != null) value = value[i]
     else {
       options.returnLastValue ? undefined : value = null
       options.valueIsFunction ? value = () => options.functionValue : undefined
@@ -43,7 +43,7 @@ global.safeEnter = function (options = {}, ...props) {
 global.mergeDefault = function (obj = {}, def = {}) {
   if (!obj) obj = {}
 
-  for (let i in def) {
+  for (const i in def) {
     if (obj[i] === undefined) obj[i] = def[i]
     if (def[i] === Object(def[i])) obj[i] = mergeDefault(obj[i], def[i])
   }
@@ -59,7 +59,7 @@ const tag = require("command-tags")
  */
 global.Tagify = function (string, prefix, ...tags) {
   if (typeof string === "object") {
-    if (prefix) return tag(string, ...tags.concat([prefix].flat(1)))
+    if (prefix) return tag(string, ...tags.concat(prefix))
     else return tag(string, ...tags)
   }
 
@@ -100,19 +100,20 @@ global.shadeColor = function (color, percent) {
  * @param {number|Function} [ms=1000] The amount of time to wait.
  * @param {Function|number} [fn=null] The function to call after waiting.
  */
-global.waitTimeout = function (ms = 1000, fn) {
+global.waitTimeout = function(ms = 1000, fn, ...args) {
   if (typeof fn === "number" && typeof ms === "function") [ms, fn] = [fn, ms]
   return new Promise(resolve => {
-    setTimeout(typeof fn === "function" ? () => resolve(fn()) : resolve, ms)
+    setTimeout(typeof fn === "function" ? () => resolve(fn(...args)) : resolve, ms, ...args)
   })
 }
 
-Object.defineProperties(Object.prototype, {
+
+Object.defineProperties(Object, {
   clear: {
-    value: function() {
-      if (!this || this.constructor !== Object) return this
-      for (const i in this) delete this[i] // json stringifies only enumerable props
-      return this
+    value: function(obj) {
+      if (!obj || obj.constructor !== Object) return this
+      for (const i in obj) delete obj[i] // json stringifies only enumerable props
+      return obj
     },
     writable: true,
     configurable: true
@@ -121,20 +122,23 @@ Object.defineProperties(Object.prototype, {
 
 Object.defineProperty(Number.prototype, Symbol.iterator, {
   value: function* () {
-    if ([Infinity, NaN, -Infinity].includes(this.valueOf())) throw new TypeError(`${this} is not iterable`)
+    if (!isFinite(this) || isNaN(this)) throw new TypeError(`${this} is not iterable`)
 
     const f = i => this > 0 ? i < this : i > this
-    for (let i = 0; f(i); this > 0 ? i++ : i--) {
-      yield i;
-    }
+    for (let i = 0; f(i); this > 0 ? i++ : i--) yield i;
   },
   writable: true,
   configurable: true
 })
 
 Object.defineProperty(Date.prototype, "format", {
-  value: function ({ style = "ios", date, seconds, hour12 = false } = {}) {
-    const [weekday, month, day, hour, minute, second] = this.toLocaleString(undefined, { day: "numeric", weekday: "short", hour: "numeric", minute: "numeric", second: "numeric", hour12, timeZone: "Europe/London", month: "short" }).replace(/AM|PM/g, "").split(/, |:| /)
+  value: function(options) {
+    if (!options) options = {}
+    let style = "ios", date, seconds, hour12 = false
+    if (typeof options === "string") style = options
+    else if (typeof options === "object") ({style = "ios", date, seconds, hour12 = false} = options)
+    
+    const [weekday, month, day, hour, minute, second] = this.toLocaleString(undefined, {day: "numeric", weekday: "short", hour: "numeric", minute: "numeric", second: "numeric", hour12, timeZone: "Europe/London", month: "short"}).replace(/AM|PM/g, "").split(/, |:| /)
     if (typeof style !== "string") style = "ios"
     if (!["ios", "normal", "clock"].includes(style.toLowerCase())) {
       return style
@@ -176,7 +180,7 @@ Object.defineProperty(String.prototype, "stripIndents", {
 Object.defineProperties(Promise.prototype, {
   default: {
     value: function (val) {
-      return this.catch(() => val).then(v => v == undefined ? val : v) // if a resolved promise returns undefined
+      return this.catch(() => val).then(v => v == null ? val : v) // if a resolved promise returns undefined
     },
     writable: true,
     configurable: true
@@ -184,7 +188,7 @@ Object.defineProperties(Promise.prototype, {
   silence: {
     value: function (val, throws = false) {
       // i actually shouldnt be disregarding all errors lol i should be trying to fix them
-      return this.catch(val ? err => console.error(err) || val : console.error)
+      return this.catch(err => console.error("Silenced Error:", err) || val)
     },
     writable: true,
     configurable: true
@@ -244,7 +248,12 @@ Object.defineProperties(Array.prototype, {
       }
 
       const [val] = values
-      if (this.includes(val)) this.splice(this.indexOf(val), 1)
+      if (this.includes(val)) {
+        for (const i of this.length) {
+          if (Object.is(this[i], val)) this.splice(i, 1)
+        }
+      }
+      
       return this
     },
     writable: true,

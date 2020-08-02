@@ -80,3 +80,5 @@ class Command extends Toggle {
     return Promise.reject("No run function defined for command " + this.name)
   }
 }
+
+module.exports = Command
