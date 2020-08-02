@@ -248,7 +248,7 @@ class Database {
       try { change = JSON.stringify(d) !== JSON.stringify(c) } catch {}
         // --silently define the variables, so i wont trigger any "set"s on proxies-- nvm
       if (change) Object.defineProperties(
-          c.clear(), Object.assign(...Object.entries(d).map(([k, value]) => ({
+          Object.clear(c), Object.assign(...Object.entries(d).map(([k, value]) => ({
             [k]: { value, writable: true, configurable: true, enumerable: true }
           })))
         )
