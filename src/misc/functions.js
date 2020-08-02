@@ -108,12 +108,12 @@ global.waitTimeout = function(ms = 1000, fn, ...args) {
 }
 
 
-Object.defineProperties(Object.prototype, {
+Object.defineProperties(Object, {
   clear: {
-    value: function() {
-      if (!this || this.constructor !== Object) return this
-      for (const i in this) delete this[i] // json stringifies only enumerable props
-      return this
+    value: function(obj) {
+      if (!obj || obj.constructor !== Object) return this
+      for (const i in obj) delete obj[i] // json stringifies only enumerable props
+      return obj
     },
     writable: true,
     configurable: true
