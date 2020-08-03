@@ -22,13 +22,15 @@ class Database {
       if (typeof onChange !== "function") onChange = null
       this._onChange = onChange // suppose you want the raw version idk
       this.onChange = function(key, path, value, prev) {
-        const p = path.split(".")
-        const [obj, prop] = [on_change.target(p.length > 1 ? get(this, p.slice(0, -1)) : this), p.last()]
-        
-        const desc = Object.getOwnPropertyDescriptor(obj, prop)
-        if (!desc || desc.get || desc.set || desc.configurable !== true || desc.writable !== true) return;
-        if (!desc.enumerable && prev === undefined) return; // newly defined via object.defineProperty
-        if (!desc.enumerable) Object.defineProperty(obj, prop, { ...desc, enumerable: true })
+        if (path) { // path is "" on some array methods
+          const p = path.split(".")
+          const [obj, prop] = [on_change.target(p.length > 1 ? get(this, p.slice(0, -1)) : this), p.last()]
+          
+          const desc = Object.getOwnPropertyDescriptor(obj, prop)
+          if (!desc || desc.get || desc.set || desc.configurable !== true || desc.writable !== true) return;
+          if (!desc.enumerable && prev === undefined) return; // newly defined via object.defineProperty
+          if (!desc.enumerable) Object.defineProperty(obj, prop, { ...desc, enumerable: true })
+        }
         
         if (onChange) onChange.bind(this)(key, path, value, prev)
         change(key, path, value)
