@@ -94,6 +94,9 @@ class Database {
       
       data = this.db.prepare(`SELECT * FROM ${table} WHERE key = (?);`).get(key)
       if (!data) return setDefault !== undefined ? this.set([key, ...path].join("."), setDefault, table) : undefined;
+      if (data.json && (data.json.startsWith('"{') || data.json.startsWith('"[') || data.json.startsWith('"\\"'))) 
+        try { data.json = JSON.parse(data.json) } catch {} // recieved a string of stringified data
+      
       data = this._parse(key, data.value)
       
       if (this.caching && table === this._tableName) this._patch(key, data)
