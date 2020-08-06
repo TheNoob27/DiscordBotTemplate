@@ -123,9 +123,9 @@ class BOT extends Client {
   async init() {
     this.events.load()
     this.commands.load()
-    return;
+    
     await this.login().then(() => {
-      this.once("ready", async () => {
+      this.once("ready", async() => {
         if (!this.users.cache.has(this.ownerID)) this._owner = await this.users.fetch(this.ownerID).default(null)
       })
     })
@@ -137,11 +137,11 @@ class BOT extends Client {
     console.log(`\n\n\n[${new Date().format()}] -- NEW PROCESS --\n`)
     const { log, error } = console
     // make everything log with a date
-    console.log = function (...data) {
+    console.log = function(...data) {
       data.unshift(new Date().format({ style: "[DD MM | HH:mm:SS]" }))
       return log(...data)
     }
-    console.error = function (...data) {
+    console.error = function(...data) {
       data.unshift(new Date().format({ style: "[DD MM | HH:mm:SS]" }))
       return error(...data)
     }
