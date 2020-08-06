@@ -1,4 +1,12 @@
 module.exports = ({ Structures, Base, Channel, GuildChannel, Constants: { ChannelTypes }, MessageManager, PermissionOverwrites, Collection }, { bypass, applyToClass }) => {
+  Object.defineProperty(GuildChannel.prototype, "hasPermission", {
+     value: function hasPermission(permission, user) {
+       return this.client.hasPermission(this, permission, user)
+     },
+     writable: true,
+     configurable: true
+   })
+  
   Structures.extend("TextChannel", TChannel => {
     class TextChannel extends Base {
       constructor(guild, data) {
@@ -33,9 +41,6 @@ module.exports = ({ Structures, Base, Channel, GuildChannel, Constants: { Channe
         if (data.messages) for (const message of data.messages) this.messages.add(message);
       }
       
-      hasPermission(permission, user) {
-        return this.client.hasPermission(this, permission, user)
-      }
       
       startTyping(seconds) {
         if (typeof seconds !== "number" || isNaN(seconds)) seconds = 1
@@ -89,6 +94,7 @@ module.exports = ({ Structures, Base, Channel, GuildChannel, Constants: { Channe
     ])
     applyToClass(TextChannel, GuildChannel, [
       "equals",
+      "hasPermission",
       "overwritesFor",
       "permissionsFor",
       "memberPermissions",
