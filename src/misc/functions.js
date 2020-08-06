@@ -168,13 +168,28 @@ Object.defineProperty(process.hrtime, "format", {
   configurable: true
 })
 
-Object.defineProperty(String.prototype, "stripIndents", {
-  value: function (tabSize) {
-    if (!tabSize || typeof tabSize !== "number" || tabSize < 1) return this.trim().replace(/^[\t ]+/gm, "")
-    return this.trim().replace(new RegExp(`^[\\t]{0,${tabSize}}`, "gm"), "")
+const { words } = require("lodash")
+Object.defineProperties(String.prototype, {
+  stripIndents: {
+    value: function(tabSize) {
+      if (!tabSize || typeof tabSize !== "number" || tabSize < 1) return this.trim().replace(/^[\t ]+/gm, "")
+      return this.trim().replace(new RegExp(`^[\\t]{0,${tabSize}}`, "gm"), "")
+    },
+    writable: true,
+    configurable: true
   },
-  writable: true,
-  configurable: true
+  toProperCase: {
+    value: function() {
+      return this.words().map(str => str[0].toUpperCase() + str.slice(1).toLowerCase()).join(" ")
+    },
+    writable: true,
+    configurable: true
+  },
+  words: {
+    value: function(pattern) { return words(this, pattern) },
+    writable: true,
+    configurable: true
+  }
 })
 
 Object.defineProperties(Promise.prototype, {
