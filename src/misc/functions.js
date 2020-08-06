@@ -111,7 +111,12 @@ global.waitTimeout = function(ms = 1000, fn, ...args) {
 Object.defineProperties(Object, {
   clear: {
     value: function(obj) {
-      if (!obj || obj.constructor !== Object) return this
+      if (!obj || obj.constructor !== Object && obj.constructor !== Array) return obj
+
+      if (obj.constructor === Array) {	
+        obj.length = 0	
+        return obj	
+      }
       for (const i in obj) delete obj[i] // json stringifies only enumerable props
       return obj
     },
@@ -201,9 +206,9 @@ Object.defineProperties(Promise.prototype, {
     configurable: true
   },
   silence: {
-    value: function (val, throws = false) {
+    value: function (val) {
       // i actually shouldnt be disregarding all errors lol i should be trying to fix them
-      return this.catch(err => console.error("Silenced Error:", err) || val)
+      return this.catch(err => console.error("Silenced Error:", err && err.stack || err) || val)
     },
     writable: true,
     configurable: true
