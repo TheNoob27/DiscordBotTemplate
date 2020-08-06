@@ -184,8 +184,8 @@ Object.defineProperties(String.prototype, {
     configurable: true
   },
   toProperCase: {
-    value: function() {
-      return this.words().map(str => str[0].toUpperCase() + str.slice(1).toLowerCase()).join(" ")
+    value: function(all = false, words = true) {
+      return (words ? this.words() : this.split(" ")).map((str, i) => i && all || !i ? str[0].toUpperCase() + str.slice(1).toLowerCase() : str.toLowerCase()).join(" ")
     },
     writable: true,
     configurable: true
