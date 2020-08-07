@@ -12,4 +12,8 @@ module.exports = class extends Commmand {
       botPerms: []
     })
   }
+  
+  async run(message, args) {
+  
+  }
 }
