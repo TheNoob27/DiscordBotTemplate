@@ -8,8 +8,10 @@ const on_change = require("on-change")
 const TableCache = {}
 
 class Database {
-  constructor({ table, cache, watching, onChange, options } = {}) {
-    this.db = DB
+  constructor({ table, cache, watching, onChange, options, path } = {}) {
+    if (typeof path === "function") path = path(__dirname) // idk maybe you might be lazy
+    this.db = typeof path === "string" ? new SQLiteDB(path) : DB
+    
     this._tableName = this._table(table)
     
     this.caching = cache
@@ -273,9 +275,9 @@ class Database {
 
 
 class Table extends Database {
-  constructor(table, cache, onChange, options) {
+  constructor(table, cache, onChange, options, path) { // `options` is the onChange options*
     if (!table) throw new Error("You must specify a table.")
-    super({ table, cache, watching: typeof onChange === "function" || onChange === true, onChange, options })
+    super({ table, cache, watching: typeof onChange === "function" || onChange === true, onChange, options, path })
   }
 }
 
