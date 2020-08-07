@@ -62,7 +62,7 @@ module.exports = class extends Event {
           .setTitle("An Error Occurred!")
           .setColor(this.client.colors.error)
           .setDescription("Something went wrong while trying to run this command! This shouldn't happen. " + (command.settings.errorMessage ? "\nNote: **" + command.settings.errorMessage + "**" : "If this persists, please **[join the support server](" + this.client.config.links.support + ")** to get help and we will try to fix it as soon as possible.") + "\n\n**Error**: ```js\n" + err[message.author.owner ? "stack" : "message"] + "\n```")
-          .setFooter("Failed to run " + prefix + command.help.name + ".")
+          .setFooter("Failed to run " + this.client.config.prefix + command.help.name + ".")
           .setTimestamp()
         ).silence()
       })
