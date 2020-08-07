@@ -20,7 +20,8 @@ module.exports = class extends Event {
     return [message]
   }
 
-  async run() {
+  async run(message) {
+    if (!message.content.startsWith(this.client.config.prefix)) return;
     const [cmd, ...args] = message.content.slice(this.client.config.prefix.length).split(" ")
     const command = this.client.commands.resolve(cmd)
     if (command) command.run(message, args)
