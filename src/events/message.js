@@ -16,7 +16,7 @@ module.exports = class extends Event {
   }
   
   async fetchPartials(message) {
-    await message.fetch()
+    if (message.partial) await message.fetch()
     return [message]
   }
 
