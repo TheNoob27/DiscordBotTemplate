@@ -21,11 +21,28 @@ module.exports = class extends Event {
   }
 
   async run(message) {
-    if (!message.content.startsWith(this.client.config.prefix)) return;
-    const [cmd, ...args] = message.content.slice(this.client.config.prefix.length).split(" ")
+    let prefix = this.client.config.prefix
+    if (message.content === `<@${this.client.user.id}>` || message.content === `<@!${this.client.user.id}>`) {
+      if (!this.client.canSpeak(message.channel)) return;
+      return message.channel.send(`My prefix for this server is \`${prefix}\`, but my mention also works as a prefix.`)
+    }
+
+    if ([`<@${this.client.user.id}>`, `<@!${this.client.user.id}>`].includes(message.content.split(" ")[0])) {
+      prefix = message.content.split(" ")[0] + " "
+      if (message.mentions.users.has(this.client.user.id)) message.mentions.users.delete(this.client.user.id)
+    }
+    
+    if (!message.content.startsWith(prefix)) return;
+    const [cmd, ...args] = message.content.slice(prefix.length).split(" ")
     const command = this.client.commands.resolve(cmd)
     
     if (command) {
+      if (!this.client.canSpeak(message.channel)) return message.author.send("I cannot speak in that channel! Please get a moderator to change my permissions for that channel, or try using me in a different channel.").silence()
+      if (command.settings.botPerms && !message.channel.hasPermission(command.settings.botPerms)) return message.channel.send("Sorry, but I am missing the permissions `" + command.settings.botPerms.join("`, `") + "` which I need for this command.").silence() // maybe parse the perms into strings for permission bits? (todo)
+      
+      if (command.settings.owner && !message.author.owner) message.channel.send("You need to be the owner to use this command.")
+      if (command.settings.requiredPermissions && !message.member.hasPermission(command.settings.requiredPermissions)) return message.channel.send("You are missing the permissions `" + command.settings.requiredPermissions.join("`, `") + "` for this command.")
+      
       if (command.cooldowns.has(message.author.id)) return command.sendCooldown(message.channel, message.author.id)
       if (command.disabled && !message.author.owner) {
         return message.channel.send(
