@@ -31,7 +31,7 @@ module.exports = class extends Event {
         return message.channel.send(
           new Embed()
           .setTitle("Command Disabled")
-          .setDescription("This command is currently disabled. " + (command.settings.disableMessage ? "The reason for that is: **" + command.settings.disableMessage + "**." : "It was probably disabled because something wasn't functioning properly, otherwise another reason.") + "\nPlease try again later, or **[join the support server](https://discord.gg/rZgxfbH)** for more info.")
+          .setDescription("This command is currently disabled. " + (command.settings.disableMessage ? "The reason for that is: **" + command.settings.disableMessage + "**." : "It was probably disabled because something wasn't functioning properly, otherwise another reason.") + "\nPlease try again later, or **[join the support server](" + this.client.config.links.support + ")** for more info.")
           .setColor(this.client.colors.error)
           .setTimestamp()
         )
