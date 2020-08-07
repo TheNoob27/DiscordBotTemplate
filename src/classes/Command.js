@@ -57,7 +57,7 @@ class Command extends Toggle {
     return new Embed()
     .setTitle("Help")
     .setColor(this.enabled ? this.client.colors.help : this.client.colors.error)
-    .addField(`Command: ${prefix}${this.help.name}`, `**Aliases**: ${this.help.aliases.join(", ") || "Not set"} \n**Description**: ${this.help.description} \n**Usage**: ${this.help.usage.replace("yiay ", prefix)} \n${this.help.example ? `**Example${this.help.example.includes("\n") ? "s" : ""}**: ${this.help.example instanceof Array ? this.help.example.random().replace("yiay ", prefix) : this.help.example.replace("yiay ", prefix)}` : ""}`)
+    .addField(`Command: ${prefix}${this.help.name}`, `**Aliases**: ${this.help.aliases.join(", ") || "Not set"} \n**Description**: ${this.help.description} \n**Usage**: ${this.help.usage.replace(this.client.config.prefix, prefix)} \n${this.help.example ? `**Example${this.help.example.includes("\n") ? "s" : ""}**: ${this.help.example instanceof Array ? this.help.example.random().replace(this.client.config.prefix, prefix) : this.help.example.replace(this.client.config.prefix, prefix)}` : ""}`)
     .addField("Extra", `**Category**: ${this.help.category} \n**Cooldown**: ${ms(this.settings.cooldown)} \n**Enabled**: ${this.enabled ? "Yes" : "No"}`)
     .addField("Notices", this.notices ? (this.settings.errorMessage ? "Something is currently wrong with this command: **" + this.settings.errorMessage + "**.\n" : "") + (this.settings.disableMessage ? "This command is disabled: **" + this.settings.disableMessage + "**" : "") : "None")
     .setFooter("() = optional, <> = required.")
