@@ -5,16 +5,28 @@ class CommandHandler extends Collection {
   constructor(client) {
     super()
     this.client = client
+    this._aliases = null
   }
 
   get aliases() {
+    if (this._aliases) return this._aliases
     const aliases = new Collection()
     for (const command of this.values()) {
       for (const alias of command.help.aliases) aliases.set(alias, command.help.name)
     }
-    return aliases
+    return this._aliases = aliases
   }
-
+  
+  set(k, v) {
+    this._aliases = null
+    return super.set(k, v)
+  }
+  
+  delete(k) {
+    this._aliases = null
+    return super.delete(k)
+  }
+  
   load(filter, reload) {
     const cmdFiles = filter instanceof Array ? filter.map(f => f + ".js") : readdir("./src/commands/");
 
