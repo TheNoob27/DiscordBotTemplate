@@ -50,9 +50,9 @@ module.exports = ({ Structures, Base, Collection, MessageAttachment, MessageFlag
         this.flags = new MessageFlags(data.flags).freeze();
         
         if (!this.content) {
-          if (data.type === 6) this.content = `${this.client.config.emojis.pin} **${this.member ? this.member.displayName : this.author ? this.author.username || this.author.toString() : "An Unknown User"}** pinned **a message** to this channel. **See all the pins.**`
+          if (data.type === 6) this.content = `**${this.member ? this.member.displayName : this.author ? this.author.username || this.author.toString() : "An Unknown User"}** pinned **a message** to this channel. **See all the pins.**`
           else if (data.type === 7) this.content = this.constructor.JoinMessages.random().replace(/{user}/g, "**" + (this.author ? this.author.username || this.author.toString() : "An Unknown User") + "**")
-          else if ([8, 9, 10, 11].includes(data.type)) this.content = `${this.client.config.emojis.boost} **${this.member ? this.member.displayName : this.author ? this.author.username || this.author.toString() : "An Unknown User"}** just boosted the server!${data.type !== 8 ? ` ${this.guild.name} has achieved **Level ${data.type - 8}!**` : ""}`
+          else if ([8, 9, 10, 11].includes(data.type)) this.content = `**${this.member ? this.member.displayName : this.author ? this.author.username || this.author.toString() : "An Unknown User"}** just boosted the server!${data.type !== 8 ? ` ${this.guild.name} has achieved **Level ${data.type - 8}!**` : ""}`
         }
       }
       
@@ -140,12 +140,11 @@ module.exports = ({ Structures, Base, Collection, MessageAttachment, MessageFlag
       "member",
       "partial",
       "patch",
-  //  "reply", - do i need this?
-      "toString", // do i really need this?
+      "reply",
+      "toString",
       "url"
     ])
     
-    /*
     Message.JoinMessages = [ 
       "Welcome, {user}. We hope you brought pizza.",
       "{user} joined the party.",
@@ -162,7 +161,7 @@ module.exports = ({ Structures, Base, Collection, MessageAttachment, MessageFlag
       "Glad you're here, {user}.",
       "Yay you made it, {user}!"
     ]
-    */
+    
     
     bypass(M, Message)
 
