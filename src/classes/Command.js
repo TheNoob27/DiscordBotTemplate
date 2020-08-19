@@ -5,6 +5,8 @@ class Command extends Toggle {
   constructor(client, options = {}) {
     super()
     
+    Object.defineProperty(this, "client", { value: client })
+    
     this.help = {
       name: options.name || null,
       aliases: options.aliases || [],
@@ -16,7 +18,7 @@ class Command extends Toggle {
     
     this.settings = {
       cooldown: options.cooldown || 1000,
-      cooldownmsg: options.cooldownmsg || "You're using this command too frequently! Please wait {time} before using it again. Voters have their cooldown times cut in half.",
+      cooldownmsg: options.cooldownmsg || `You're using this command too frequently! Please wait {time} before using it again.${this.client.voters ? " Voters have their cooldown times cut in half." : ""}`,
       errorMessage: null,
       disableMessage: null,
       lowerCaseArgs: typeof options.lowerCaseArgs === "number" ? [options.lowerCaseArgs] : options.lowerCaseArgs || false,
@@ -26,8 +28,6 @@ class Command extends Toggle {
     }
     
     this.cooldowns = new Collection()
-    
-    Object.defineProperty(this, "client", { value: client })
   }
   
   addCooldown(id) {
@@ -36,7 +36,7 @@ class Command extends Toggle {
       time: Date.now(),
       timer: setTimeout(() => {
         this.cooldowns.delete(id)
-      }, this.client.voters.includes(id) ? this.settings.cooldown / 2 : this.settings.cooldown)
+      }, this.client.voters && this.client.voters.includes(id) ? this.settings.cooldown / 2 : this.settings.cooldown)
     })
   }
   
