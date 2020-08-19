@@ -20,7 +20,7 @@ module.exports = class extends Command {
     return message.channel.send(
       new Embed()
       .setTitle("Help")
-      .setDescription(`Here are all ${this.client.commands.size} of my commands: \n${this.client.commands.map(c => c.usage).join("\n")}`)
+      .setDescription(`Here are all ${this.client.commands.size} of my commands: \n${this.client.commands.map(c => c.help.usage).join("\n")}`)
       .setColor(this.client.colors.color)
     )
   }
