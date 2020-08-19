@@ -1,5 +1,6 @@
 const { Collection } = require("discord.js")
 const { readdirSync: readdir } = require("fs")
+const { Embed } = require("../classes")
 
 class EventHandler extends Collection {
   constructor(client) {
