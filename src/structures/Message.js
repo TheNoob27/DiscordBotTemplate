@@ -1,6 +1,6 @@
 const { Embed } = require("../classes")
-const { TypeError } = require("discord.js/src/errors"),
-      ReactionManager = require("discord.js/src/managers/ReactionManager.js")
+const { TypeError } = require("../../node_modules/discord.js/src/errors"),
+      ReactionManager = require("../../node_modules/discord.js/src/managers/ReactionManager.js")
 
 module.exports = ({ Structures, Base, Collection, MessageAttachment, MessageFlags, Constants: { MessageTypes }, MessageMentions: Mentions, APIMessage }, { bypass, applyToClass }) => {
   Structures.extend("Message", M => {
