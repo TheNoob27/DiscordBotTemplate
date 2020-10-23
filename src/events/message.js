@@ -2,7 +2,7 @@ const { Event, Embed } = require("../classes")
 
 module.exports = class extends Event {
   constructor(client) {
-    super(client, "event")
+    super(client, "message")
   }
 
   shouldRun(message) {
