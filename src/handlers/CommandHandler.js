@@ -26,7 +26,7 @@ class CommandHandler extends Collection {
     this._aliases = null
     return super.delete(k)
   }
-  
+
   load(filter, reload) {
     const cmdFiles = filter instanceof Array ? filter.map(f => f + ".js") : readdir("./src/commands/");
 
@@ -38,35 +38,38 @@ class CommandHandler extends Collection {
         cmd = new (require(`../commands/${f}`))(this.client)
         this.set(cmd.help.name, cmd)
       } catch(e) {
+        if (reload) throw e 
         return console.error(`Couldn't load command: ${f} - Error:`, e)
       }
     })
 
-    console.log(`[CLIENT] Loaded ${filter instanceof Array ? filter.length : this.size} commands and ${this.aliases.size} aliases`);
+    if (!reload) console.log(`[CLIENT] Loaded ${filter instanceof Array ? filter.length : this.size} commands and ${this.aliases.size} aliases`);
 
     return this
   }
 
-  reload(cmd) {
+  reload(cmd, throws, throwcmd) {
     if (cmd == null) {
       this.clear()
+      ["Toggle", "Command"].forEach(i => delete require.cache[require.resolve(`../classes/${i}.js`)])
       return this.load(null, true)
     }
 
-    if (Array.isArray(cmd)) return cmd.filter(c => c).map(this.reload.bind(this))[0]
+    if (Array.isArray(cmd)) return cmd.filter(c => c).map(c => this.reload(c, throws, throwcmd))[0]
 
     let c = this.resolve(cmd)
     if (c) c.reload()
     else if (typeof cmd === "string") {
       try {
-        this.load([cmd])
-      } catch {}
+        this.load([cmd], true)
+      } catch(e) { if (throws) throw throwcmd ? [cmd, e] : e }
     }
 
     return this
   }
 
   resolve(cmd) {
+    if (typeof cmd === "string") cmd = cmd.toLowerCase()
     return this.get(cmd) || this.get(this.aliases.get(cmd))
   }
 }

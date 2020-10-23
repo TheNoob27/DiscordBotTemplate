@@ -14,10 +14,12 @@ class EventHandler extends Collection {
     evFiles.forEach(e => {
       let event;
       try {
-        if (reload) delete require.cache[require.resolve(`../events/${f}`)]
+        if (reload) delete require.cache[require.resolve(`../events/${e}`)]
         event = new (require(`../events/${e}`))(this.client)
+        if (event.name === "event") console.error("You forgot to name one of your events! -", event.name = e.split(".")[0])
         this.set(event.name, event)
       } catch(err) {
+        if (reload) throw err
         return console.error(`Couldn't load event: ${e}, Error:`, err);
       }
 
@@ -56,28 +58,34 @@ class EventHandler extends Collection {
       })
     })
 
-    console.log("[EVENT] => Loaded a total of " + (filter instanceof Array ? filter.length : this.size) + " events.")
+    if (!reload) console.log("[EVENT] => Loaded a total of " + (filter instanceof Array ? filter.length : this.size) + " events.")
 
     return this
   }
 
-  reload(ev) {
+  reload(ev, throws, throwev) {
     if (ev == null) {
       this.clear()
+      ["Toggle", "Event"].forEach(i => delete require.cache[require.resolve(`../classes/${i}.js`)])
       return this.load(null, true)
     }
 
-    if (Array.isArray(ev)) return ev.filter(e => e).map(this.reload.bind(this))[0]
+    if (Array.isArray(ev)) return ev.filter(e => e).map(e => this.reload(e, throws, throwev))[0]
 
-    const e = this.get(ev)
+    const e = this.resolve(ev)
     if (e) e.reload()
     else if (typeof ev === "string") {
       try {
-        this.load([ev])
-      } catch { }
+        this.load([ev], true)
+      } catch(e) { if (throws) throw throwev ? [ev, e] : e }
     }
 
     return this
+  }
+
+  resolve(e) {
+    if (typeof e === "string") e = e.toLowerCase()
+    return this.find(e => e.name === e)
   }
 
   get errors() {
